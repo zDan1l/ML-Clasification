@@ -1,0 +1,22 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/
+
+# Artefak Windows / file nyasar
+nul
+Thumbs.db
+desktop.ini
+
+# Dataset & model besar (opsional: uncomment jika tidak mau di-push)
+# diabetes_012_health_indicators_BRFSS2015.csv
+# *.pkl
