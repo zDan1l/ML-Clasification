@@ -30,13 +30,21 @@ from sklearn.metrics import (confusion_matrix, accuracy_score,
                              classification_report)
 from imblearn.over_sampling import SMOTE
 import joblib
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+DATA = BASE / "data" / "diabetes_012_health_indicators_BRFSS2015.csv"
+OUT = BASE / "outputs" / "smote"
+MODELS = BASE / "models" / "smote"
+OUT.mkdir(parents=True, exist_ok=True)
+MODELS.mkdir(parents=True, exist_ok=True)
 
 N_SAMPEL_TRAIN = 10_000
 
 # -------------------------------------------------------------
 # 1. INPUT DATA
 # -------------------------------------------------------------
-FILE = "diabetes_012_health_indicators_BRFSS2015.csv"
+FILE = DATA
 df = pd.read_csv(FILE)
 print("=" * 60)
 print("1. INPUT DATA")
@@ -131,7 +139,7 @@ model = SVC(random_state=42, cache_size=500)
 t0 = time.time()
 model.fit(X_tr_res, y_tr_res)
 print(f"Model SVM selesai dilatih dalam {time.time()-t0:.1f} detik.")
-joblib.dump(model, "model_SVM.pkl")
+joblib.dump(model, MODELS / "model_SVM.pkl")
 
 # -------------------------------------------------------------
 # 7-8. TESTING + EVALUASI pada TEST FULL (sama dgn DT/NB)
@@ -162,23 +170,23 @@ plt.xlabel("Prediksi")
 plt.ylabel("Aktual")
 plt.title(f"Confusion Matrix - SVM (sampling train 10k)\nAkurasi: {akurasi:.4f}")
 plt.tight_layout()
-plt.savefig("confusion_matrix_SVM.png")
+plt.savefig(OUT / "confusion_matrix_SVM.png")
 plt.close()
 
 # Simpan ringkasan untuk dashboard
-with open("hasil_svm.txt", "w") as f:
+with open(OUT / "hasil_svm.txt", "w") as f:
     f.write(f"akurasi={akurasi:.4f}\npresisi={presisi:.4f}\nrecall={recall:.4f}\nf1={f1:.4f}\n")
     f.write("cm=" + np.array2string(cm, separator=",") + "\n")
 
 # Gabungkan ke hasil_perbandingan.csv
-df_hasil = pd.read_csv("hasil_perbandingan.csv")
+df_hasil = pd.read_csv(OUT / "hasil_perbandingan.csv")
 df_hasil = df_hasil[df_hasil["Model"] != "SVM"]
 df_hasil = pd.concat([df_hasil, pd.DataFrame([{
     "Model": "SVM", "Akurasi": akurasi,
     "Presisi_weighted": presisi, "Recall_weighted": recall,
     "F1_weighted": f1}])], ignore_index=True)
 df_hasil = df_hasil.sort_values("Akurasi", ascending=False)
-df_hasil.to_csv("hasil_perbandingan.csv", index=False)
+df_hasil.to_csv(OUT / "hasil_perbandingan.csv", index=False)
 print("\nhasil_perbandingan.csv diperbarui:")
 print(df_hasil.to_string(index=False))
 
@@ -188,8 +196,8 @@ for i, kol in enumerate(["Akurasi", "Presisi_weighted", "Recall_weighted", "F1_w
     plt.bar(x + (i - 1.5) * lebar, df_hasil[kol], width=lebar, label=kol)
 plt.xticks(x, df_hasil["Model"]); plt.ylim(0, 1); plt.ylabel("Skor")
 plt.title("Perbandingan Kinerja: Decision Tree vs Naive Bayes vs SVM")
-plt.legend(); plt.tight_layout(); plt.savefig("perbandingan_metrik.png"); plt.close()
+plt.legend(); plt.tight_layout(); plt.savefig(OUT / "perbandingan_metrik.png"); plt.close()
 
-open("model_terbaik.txt", "w").write(df_hasil.iloc[0]["Model"])
+open(MODELS / "model_terbaik.txt", "w").write(df_hasil.iloc[0]["Model"])
 print(f"\nModel terbaik: {df_hasil.iloc[0]['Model']}")
 print("Selesai.")

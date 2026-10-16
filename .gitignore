@@ -16,6 +16,7 @@ __pycache__/
 nul
 Thumbs.db
 desktop.ini
+.opencode
 
 # Dataset & model besar (opsional: uncomment jika tidak mau di-push)
 # diabetes_012_health_indicators_BRFSS2015.csv

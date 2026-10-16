@@ -14,11 +14,15 @@ from pathlib import Path
 st.set_page_config(page_title="Klasifikasi Diabetes BRFSS 2015", layout="wide")
 
 BASE = Path(__file__).parent
-terbaik = (BASE / "model_terbaik.txt").read_text().strip() if (BASE / "model_terbaik.txt").exists() else "DecisionTree"
-model = joblib.load(BASE / f"model_{terbaik}.pkl")
-scaler = joblib.load(BASE / "scaler.pkl")
+M_SMOTE = BASE / "models" / "smote"
+O_SMOTE = BASE / "outputs" / "smote"
+M_UNDER = BASE / "models" / "undersampling"
+O_UNDER = BASE / "outputs" / "undersampling"
+terbaik = (M_SMOTE / "model_terbaik.txt").read_text().strip() if (M_SMOTE / "model_terbaik.txt").exists() else "DecisionTree"
+model = joblib.load(M_SMOTE / f"model_{terbaik}.pkl")
+scaler = joblib.load(M_SMOTE / "scaler.pkl")
 try:
-    feature_columns = joblib.load(BASE / "feature_columns.pkl")
+    feature_columns = joblib.load(M_SMOTE / "feature_columns.pkl")
 except Exception:
     feature_columns = ['HighBP','HighChol','CholCheck','BMI','Smoker','Stroke',
         'HeartDiseaseorAttack','PhysActivity','Fruits','Veggies','HvyAlcoholConsump',
@@ -52,7 +56,7 @@ if menu == "Dashboard Perbandingan":
 
     # Tabel metrik
     try:
-        df_hasil = pd.read_csv(BASE / "hasil_perbandingan.csv")
+        df_hasil = pd.read_csv(O_SMOTE / "hasil_perbandingan.csv")
         st.subheader("Tabel Metrik (weighted average)")
         st.dataframe(df_hasil.style.format({"Akurasi": "{:.4f}", "Presisi_weighted": "{:.4f}", "Recall_weighted": "{:.4f}", "F1_weighted": "{:.4f}"}), width="stretch")
         st.bar_chart(df_hasil.set_index("Model")[["Akurasi", "Presisi_weighted", "Recall_weighted", "F1_weighted"]])
@@ -63,22 +67,22 @@ if menu == "Dashboard Perbandingan":
     with c1:
         st.subheader("Confusion Matrix — Decision Tree (Akurasi 0.7373)")
         try:
-            st.image(str(BASE / "confusion_matrix_DecisionTree.png"))
+            st.image(str(O_SMOTE / "confusion_matrix_DecisionTree.png"))
         except Exception:
             st.write("File gambar belum ada.")
         st.code("[[31616   984  5412]\n [  643    36   247]\n [ 4526   261  2232]]", language="text")
     with c2:
         st.subheader("Confusion Matrix — Naive Bayes (Akurasi 0.5116)")
         try:
-            st.image(str(BASE / "confusion_matrix_NaiveBayes.png"))
+            st.image(str(O_SMOTE / "confusion_matrix_NaiveBayes.png"))
         except Exception:
             st.write("File gambar belum ada.")
         st.code("[[19260 11783  6969]\n [  199   376   351]\n [  786  2356  3877]]", language="text")
 
     st.subheader("Confusion Matrix — SVM (Akurasi 0.7006)")
-    st.caption("SVC RBF, train sampling stratified 10rb + SMOTE, test FULL sama seperti DT/NB. Full-data ±500rb baris tidak feasible (O(n²)) — lihat `klasifikasi_svm_sampling_kelompok2.py`.")
+    st.caption("SVC RBF, train sampling stratified 10rb + SMOTE, test FULL sama seperti DT/NB. Full-data ±500rb baris tidak feasible (O(n²)) — lihat `src/klasifikasi_svm_sampling.py`.")
     try:
-        st.image(str(BASE / "confusion_matrix_SVM.png"))
+        st.image(str(O_SMOTE / "confusion_matrix_SVM.png"))
     except Exception:
         st.write("File gambar belum ada.")
     st.code("[[28233  2841  6938]\n [  443   101   382]\n [ 2508   648  3863]]", language="text")
@@ -99,6 +103,23 @@ if menu == "Dashboard Perbandingan":
 
 **3. Kesimpulan:** Model terbaik = **Decision Tree** (akurasi 0,7373, F1 0,7456). SVM kedua (0,7006) — bagus di kelas 2 (recall diabetes 55%) tapi lemah di pre-diabetes. Naive Bayes terakhir (0,5116) karena asumsi independensi + Gaussian dilanggar data biner/ordinal.
 """)
+
+    st.subheader("Eksperimen tambahan: Undersampling (semua train ±11rb baris)")
+    st.caption("RandomUnderSampler menggantikan SMOTE agar SVM full-train bisa jalan (7,3 detik). Test set FULL & identik dengan track SMOTE di atas, jadi angkanya comparable. Peringkat berbalik: NB 0,6387 > SVM 0,5995 > DT 0,4573 — DT paling terpukul karena kehilangan 97% data kelas sehat.")
+    try:
+        df_under = pd.read_csv(O_UNDER / "hasil_perbandingan.csv")
+        st.dataframe(df_under.style.format({"Akurasi": "{:.4f}", "Presisi_weighted": "{:.4f}", "Recall_weighted": "{:.4f}", "F1_weighted": "{:.4f}"}), width="stretch")
+        st.bar_chart(df_under.set_index("Model")[["Akurasi", "Presisi_weighted", "Recall_weighted", "F1_weighted"]])
+        u1, u2, u3 = st.columns(3)
+        for col, m, ak in zip([u1, u2, u3], ["DecisionTree", "NaiveBayes", "SVM"], ["0.4573", "0.6387", "0.5995"]):
+            with col:
+                st.caption(f"{m} ({ak})")
+                try:
+                    st.image(str(O_UNDER / f"confusion_matrix_{m}.png"))
+                except Exception:
+                    st.write("Gambar belum ada.")
+    except Exception as e:
+        st.warning(f"Hasil undersampling belum ada (jalankan `src/perbandingan_undersampling.py`): {e}")
 
 # ==================== HALAMAN 2: PREDIKSI ====================
 else:

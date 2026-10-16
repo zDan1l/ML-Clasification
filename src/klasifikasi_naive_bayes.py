@@ -1,8 +1,10 @@
 # =============================================================
 # KLASIFIKASI DIABETES - BRFSS 2015 Health Indicators
-# Alur sesuai flowchart:
+# Metode: NAIVE BAYES (GaussianNB)
+# Alur PERSIS SAMA seperti klasifikasi_diabetes_kelompok2.py
+# (Decision Tree), hanya klasifikatornya diganti:
 # Input -> Preprocessing -> Split Data -> Transformasi (train & test)
-# -> Resampling (oversampling, hanya train) -> Training (Decision Tree)
+# -> Resampling (oversampling SMOTE, hanya train) -> Training (Naive Bayes)
 # -> Testing -> Evaluasi
 # =============================================================
 
@@ -12,16 +14,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import (confusion_matrix, accuracy_score,
                              precision_score, recall_score, f1_score,
                              classification_report)
 from imblearn.over_sampling import SMOTE
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+DATA = BASE / "data" / "diabetes_012_health_indicators_BRFSS2015.csv"
+OUT = BASE / "outputs" / "smote"
+OUT.mkdir(parents=True, exist_ok=True)
 
 # -------------------------------------------------------------
 # 1. INPUT DATA
 # -------------------------------------------------------------
-FILE = "diabetes_012_health_indicators_BRFSS2015.csv"
+FILE = DATA
 df = pd.read_csv(FILE)
 print("=" * 60)
 print("1. INPUT DATA")
@@ -102,9 +110,9 @@ sns.barplot(x=sebelum.index, y=sebelum.values,
             palette='coolwarm', hue=sebelum.index, legend=False)
 plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
-plt.title("Distribusi Sebelum SMOTE (Imbalance)")
+plt.title("Distribusi Sebelum SMOTE (Imbalance) - Naive Bayes")
 plt.tight_layout()
-plt.savefig("distribusi_sebelum_smote.png")
+plt.savefig(OUT / "distribusi_sebelum_smote_NB.png")
 
 # --- Proses oversampling ---
 smote = SMOTE(random_state=42)
@@ -120,21 +128,21 @@ sns.barplot(x=sesudah.index, y=sesudah.values,
             palette='coolwarm', hue=sesudah.index, legend=False)
 plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
-plt.title("Distribusi Sesudah SMOTE (Seimbang)")
+plt.title("Distribusi Sesudah SMOTE (Seimbang) - Naive Bayes")
 plt.tight_layout()
-plt.savefig("distribusi_sesudah_smote.png")
+plt.savefig(OUT / "distribusi_sesudah_smote_NB.png")
 
 plt.show()
 
 # -------------------------------------------------------------
-# 6. TRAINING : Decision Tree
+# 6. TRAINING : Naive Bayes (GaussianNB)
 # -------------------------------------------------------------
 print("\n" + "=" * 60)
-print("6. TRAINING (Decision Tree)")
+print("6. TRAINING (Naive Bayes - GaussianNB)")
 print("=" * 60)
-model = DecisionTreeClassifier(random_state=42)
+model = GaussianNB()
 model.fit(X_train, y_train)
-print("Model Decision Tree selesai dilatih.")
+print("Model Naive Bayes selesai dilatih.")
 
 # -------------------------------------------------------------
 # 7. TESTING : prediksi pada data testing

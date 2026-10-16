@@ -24,11 +24,17 @@ from sklearn.metrics import (confusion_matrix, accuracy_score,
                              precision_score, recall_score, f1_score,
                              classification_report)
 from imblearn.over_sampling import SMOTE
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+DATA = BASE / "data" / "diabetes_012_health_indicators_BRFSS2015.csv"
+OUT = BASE / "outputs" / "smote"
+OUT.mkdir(parents=True, exist_ok=True)
 
 # -------------------------------------------------------------
 # 1. INPUT DATA
 # -------------------------------------------------------------
-FILE = "diabetes_012_health_indicators_BRFSS2015.csv"
+FILE = DATA
 df = pd.read_csv(FILE)
 print("=" * 60)
 print("1. INPUT DATA")
@@ -111,7 +117,7 @@ plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
 plt.title("Distribusi Sebelum SMOTE (Imbalance) - SVM")
 plt.tight_layout()
-plt.savefig("distribusi_sebelum_smote_SVM.png")
+plt.savefig(OUT / "distribusi_sebelum_smote_SVM.png")
 
 # --- Proses oversampling ---
 smote = SMOTE(random_state=42)
@@ -129,7 +135,7 @@ plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
 plt.title("Distribusi Sesudah SMOTE (Seimbang) - SVM")
 plt.tight_layout()
-plt.savefig("distribusi_sesudah_smote_SVM.png")
+plt.savefig(OUT / "distribusi_sesudah_smote_SVM.png")
 
 plt.show()
 

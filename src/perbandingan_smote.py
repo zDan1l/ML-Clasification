@@ -26,11 +26,19 @@ from sklearn.metrics import (confusion_matrix, accuracy_score,
                              classification_report)
 from imblearn.over_sampling import SMOTE
 import joblib
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+DATA = BASE / "data" / "diabetes_012_health_indicators_BRFSS2015.csv"
+OUT = BASE / "outputs" / "smote"
+MODELS = BASE / "models" / "smote"
+OUT.mkdir(parents=True, exist_ok=True)
+MODELS.mkdir(parents=True, exist_ok=True)
 
 # -------------------------------------------------------------
 # 1. INPUT DATA
 # -------------------------------------------------------------
-FILE = "diabetes_012_health_indicators_BRFSS2015.csv"
+FILE = DATA
 df = pd.read_csv(FILE)
 print("=" * 60)
 print("1. INPUT DATA")
@@ -91,8 +99,8 @@ scaler = MinMaxScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 print("Semua fitur diskalakan ke rentang [0, 1].")
-joblib.dump(scaler, "scaler.pkl")
-joblib.dump(feature_columns, "feature_columns.pkl")
+joblib.dump(scaler, MODELS / "scaler.pkl")
+joblib.dump(feature_columns, MODELS / "feature_columns.pkl")
 
 # -------------------------------------------------------------
 # 5. RESAMPLING : SMOTE hanya pada data training
@@ -111,7 +119,7 @@ plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
 plt.title("Distribusi Sebelum SMOTE (Imbalance)")
 plt.tight_layout()
-plt.savefig("distribusi_sebelum_smote.png")
+plt.savefig(OUT / "distribusi_sebelum_smote.png")
 plt.close()
 
 smote = SMOTE(random_state=42)
@@ -128,7 +136,7 @@ plt.xlabel("Kelas Diabetes_012")
 plt.ylabel("Jumlah")
 plt.title("Distribusi Sesudah SMOTE (Seimbang)")
 plt.tight_layout()
-plt.savefig("distribusi_sesudah_smote.png")
+plt.savefig(OUT / "distribusi_sesudah_smote.png")
 plt.close()
 
 print(f"\nUkuran train setelah SMOTE: {X_train_res.shape}")
@@ -179,11 +187,11 @@ for nama, model in models.items():
     plt.ylabel("Aktual")
     plt.title(f"Confusion Matrix - {nama}\nAkurasi: {akurasi:.4f}")
     plt.tight_layout()
-    plt.savefig(f"confusion_matrix_{nama}.png")
+    plt.savefig(OUT / f"confusion_matrix_{nama}.png")
     plt.close()
 
     # Simpan model
-    joblib.dump(model, f"model_{nama}.pkl")
+    joblib.dump(model, MODELS / f"model_{nama}.pkl")
 
     hasil.append({
         "Model": nama,
@@ -200,7 +208,7 @@ print("\n" + "=" * 60)
 print("RINGKASAN PERBANDINGAN")
 print("=" * 60)
 print(df_hasil.to_string(index=False))
-df_hasil.to_csv("hasil_perbandingan.csv", index=False)
+df_hasil.to_csv(OUT / "hasil_perbandingan.csv", index=False)
 
 # Plot perbandingan metrik
 plt.figure(figsize=(8, 5))
@@ -214,12 +222,12 @@ plt.ylabel("Skor")
 plt.title("Perbandingan Kinerja: Decision Tree vs Naive Bayes vs SVM")
 plt.legend()
 plt.tight_layout()
-plt.savefig("perbandingan_metrik.png")
+plt.savefig(OUT / "perbandingan_metrik.png")
 plt.close()
 
 # Tandai model terbaik (akurasi tertinggi) untuk dipakai di Streamlit
 terbaik = df_hasil.iloc[0]["Model"]
 print(f"\nModel terbaik (akurasi tertinggi): {terbaik}")
-with open("model_terbaik.txt", "w") as f:
+with open(MODELS / "model_terbaik.txt", "w") as f:
     f.write(terbaik)
 print("Selesai. File: hasil_perbandingan.csv, confusion_matrix_*.png, perbandingan_metrik.png")
