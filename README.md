@@ -15,7 +15,7 @@ Undersampling (train ±11rb) justru membalik peringkat: DT paling terpukul karen
 
 ---
 
-## 🚀 Cara paling mudah menjalankan UI
+## Cara paling mudah menjalankan UI
 
 **Klik dua kali file `run_app.bat`.** Selesai — browser terbuka otomatis di
 `http://localhost:8501`. Launcher ini otomatis memakai Streamlit dari `.venv`,
@@ -27,7 +27,7 @@ Jika `run_app.bat` belum ada / ingin manual, jalankan dari terminal (PowerShell 
 .venv\Scripts\streamlit.exe run app.py
 ```
 
-> ⚠️ **Jangan** pakai perintah `streamlit run app.py` begitu saja. Di komputer ini
+> **Jangan** pakai perintah `streamlit run app.py` begitu saja. Di komputer ini
 > perintah `streamlit` menunjuk ke **Python 3.13** yang tidak punya `scikit-learn`,
 > `joblib`, dan `imblearn`, sehingga app langsung gagal dengan
 > `ModuleNotFoundError: No module named 'joblib'`.
@@ -35,12 +35,12 @@ Jika `run_app.bat` belum ada / ingin manual, jalankan dari terminal (PowerShell 
 
 Untuk menghentikan server: tekan `Ctrl+C` di jendela terminal.
 
-> 💡 Saat **pertama kali** dijalankan, Streamlit menampilkan permintaan email
+> Saat **pertama kali** dijalankan, Streamlit menampilkan permintaan email
 > (`Email:`). Cukup tekan **Enter** (biarkan kosong) — hanya muncul sekali.
 
 ---
 
-## 🧰 Setup pertama kali (sekali saja)
+## Setup pertama kali (sekali saja)
 
 ```bat
 python -m venv .venv
@@ -49,7 +49,7 @@ python -m venv .venv
 
 Setelah ini, cukup pakai `run_app.bat` untuk membuka UI.
 
-## 📊 Menjalankan training / perbandingan
+## Menjalankan training / perbandingan
 
 Satu metode:
 
@@ -66,13 +66,7 @@ Perbandingan lengkap:
 .venv\Scripts\python src\perbandingan_undersampling.py   :: DT + NB + SVM full-train ±11rb baris
 ```
 
-Regenerate laporan Word:
-
-```bat
-.venv\Scripts\python src\buat_laporan.py
-```
-
-## 📁 Struktur
+## Struktur
 
 ```
 app.py             UI Streamlit (Dashboard · Prediksi · Tentang)
@@ -80,12 +74,12 @@ run_app.bat        launcher UI sekali-klik
 requirements.txt   daftar dependensi
 .streamlit/        config.toml — konfigurasi tema UI
 data/              dataset CSV BRFSS 2015
-src/               script klasifikasi, perbandingan, generator laporan
+src/               script klasifikasi & perbandingan
 models/            smote/ & undersampling/ — model .pkl, scaler, model_terbaik.txt
 outputs/           smote/ & undersampling/ — confusion matrix, metrik CSV, grafik
 ```
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 | Gejala | Penyebab | Solusi |
 |---|---|---|
