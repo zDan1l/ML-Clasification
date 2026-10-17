@@ -75,16 +75,14 @@ Regenerate laporan Word:
 ## 📁 Struktur
 
 ```
-run_app.bat        launcher UI sekali-klik (pakai .venv)
 app.py             UI Streamlit (Dashboard · Prediksi · Tentang)
+run_app.bat        launcher UI sekali-klik
 requirements.txt   daftar dependensi
-task.txt           soal tugas
-data/              dataset CSV
+.streamlit/        config.toml — konfigurasi tema UI
+data/              dataset CSV BRFSS 2015
 src/               script klasifikasi, perbandingan, generator laporan
-models/smote|undersampling/   model .pkl, scaler, model_terbaik.txt
-outputs/smote|undersampling/  confusion matrix, metrik CSV, grafik
-docs/              laporan & arsip
-.venv/             virtual environment (tidak di-push ke git)
+models/            smote/ & undersampling/ — model .pkl, scaler, model_terbaik.txt
+outputs/           smote/ & undersampling/ — confusion matrix, metrik CSV, grafik
 ```
 
 ## ❓ Troubleshooting
