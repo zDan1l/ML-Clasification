@@ -9,14 +9,15 @@ __pycache__/
 *$py.class
 .ipynb_checkpoints/
 
-# Streamlit
-.streamlit/
+# Streamlit (config.toml ikut repo, secrets tidak)
+.streamlit/secrets.toml
 
 # Artefak Windows / file nyasar
 nul
 Thumbs.db
 desktop.ini
 .opencode
+docs
 
 # Dataset & model besar (opsional: uncomment jika tidak mau di-push)
 # diabetes_012_health_indicators_BRFSS2015.csv
