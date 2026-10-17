@@ -1,4 +1,0 @@
-Analisis hasil confusion matrixnya, dan bandingkan kinerja metode Naïve bayes, SVM, 
-dan Decision tree (hasil UTS) 
-Buatlah UI/UX menggunakan streamlit / flash pada metode yang memiliki akurasi 
-tertinggi 
